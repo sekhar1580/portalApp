@@ -1,7 +1,9 @@
 from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
 import requests
+import json
 
-
+@csrf_exempt
 def index(request):
     authUrl= "https://altrasoftwaresystems-dev-ed.develop.my.salesforce.com/services/oauth2/token?"
     payload = {
@@ -15,10 +17,21 @@ def index(request):
     try:
         response = requests.post(authUrl, data=payload)
         response.raise_for_status()
-        print(response.json()["access_token"])
+        token = response.json()["access_token"]
+        print
     except requests.exceptions.HTTPError as err:
         raise SystemExit(err)
 
     #response = requests.get('https://jsonplaceholder.typicode.com/users')
-    #convert reponse data into json
-    return HttpResponse(response)
+    #convert reponse data into json  
+    try:
+        profilePayload = json.loads(request.body)       
+        url = "https://altrasoftwaresystems-dev-ed.develop.my.salesforce.com/services/data/v58.0/sobjects/Referral_Staging__c"
+        headers = {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token}
+        response2 = requests.post(url, data=json.dumps(profilePayload), headers=headers)
+        print(json.dumps(profilePayload))
+        response2.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        raise SystemExit(err)
+
+    return HttpResponse(response2)

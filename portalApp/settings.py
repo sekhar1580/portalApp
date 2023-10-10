@@ -27,6 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS=['localhost']
 CORS_ORIGIN_ALLOW_ALL = True
+CSRF_TRUSTED_ORIGINS = ['http://localhost:4200']
 
 
 # Application definition
